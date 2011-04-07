@@ -1,0 +1,18 @@
+=head1 NAME
+
+radioPlayer - Play your favourite radio stations easily in the terminal
+
+=head1 SYNOPSYS
+
+Small script to play radio stations. 
+
+=head1 USAGE
+
+=over 8
+
+ $ ./radioPlayer.pl -s <station>
+
+=back
+
+=cut
+
