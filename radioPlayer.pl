@@ -9,8 +9,8 @@
 
 use strict;
 use warnings;
+use autodie;
 use Carp;
-use Data::Dumper;
 use File::Basename;
 use Getopt::Long;
 use POSIX ":sys_wait_h";
