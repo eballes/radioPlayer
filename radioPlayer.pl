@@ -13,6 +13,13 @@ use Carp;
 use Data::Dumper;
 use File::Basename;
 use Getopt::Long;
+use POSIX ":sys_wait_h";
+use Term::ANSIColor;
+$Term::ANSIColor::AUTORESET++;
+
+my $pid;
+my $gVerbose;
+$SIG{INT} = sub { print "\nExiting...\n"; kill 3, $pid };
 
 chomp(my $MPLAYER = `which mplayer`);
 chomp(my $CVLC = `which cvlc`);
@@ -54,7 +61,22 @@ sub play {
     $player = $MPLAYER unless $player;
     croak "Suitable player not found!" unless $player;
 
-    exec ($player, $url); # I don't want to come back! 
+    if($pid = fork()) { # Parent
+        print colored("Press Ctrl+C to stop execution...\n", 'red'); 
+        print "Playing...\n";
+        waitpid (-1, 0);
+        print "Exiting...\n";
+    }
+    elsif(defined $pid) { # Child
+        sleep 1;
+        close STDIN;
+        close STDOUT unless $gVerbose;
+        close STDERR unless $gVerbose;
+        open STDIN, '<', '/dev/null';
+        open STDOUT, '>', '/dev/null' unless $gVerbose;
+        open STDERR, '>', '/dev/null' unless $gVerbose;
+        exec ($player, $url); 
+    }
 }
 
 
@@ -74,6 +96,7 @@ sub help {
 sub main {
     GetOptions(
         'radio|r|station|s=s' => \( my $station = undef ),
+        'verbose|v'    => \( $gVerbose ),
         'help|h'    => \( my $printHelp = undef ),
     );
 
