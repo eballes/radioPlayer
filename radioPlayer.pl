@@ -19,7 +19,7 @@ $Term::ANSIColor::AUTORESET++;
 
 my $pid;
 my $gVerbose;
-$SIG{INT} = sub { print "\nExiting...\n"; kill 3, $pid };
+$SIG{INT} = sub { print "\nExiting...\n"; kill 3, $pid; };
 
 chomp(my $MPLAYER = `which mplayer`);
 chomp(my $CVLC = `which cvlc`);
@@ -33,7 +33,7 @@ my $stations = {
     BBC5 => 'http://bbc.co.uk/radio/listen/live/r5l.asx',
     BBC6 => 'http://bbc.co.uk/radio/listen/live/r6.asx',
     BBCWorld => 'http://www.bbc.co.uk/worldservice/meta/tx/nb/live/eneuk.pls',
-    #BBCWorldNews => 'http://www.bbc.co.uk/worldservice/meta/tx/nb/live/ennws.pls',
+    BBCWorldNews => 'http://www.bbc.co.uk/worldservice/meta/tx/nb/live/ennws.pls',
     BBCScotland => 'http://wmlive.bbc.co.uk/wms/nations/scotland',
     AR => 'http://ogg2.as34763.net/vr160.ogg.m3u',
     AR80 => 'http://ogg2.as34763.net/a8160.ogg.m3u',
@@ -42,7 +42,7 @@ my $stations = {
 };
 
 my $players = {
-    pls => $MPLAYER,
+    pls => $CVLC,
     asx => $CVLC,
     m3u => $CVLC,
 };
@@ -58,20 +58,16 @@ sub play {
     if (my ($extension) = $url =~ /\.([\w\d]+)$/) {
         $player = $players->{lc $extension};
     }
-    $player = $MPLAYER unless $player;
-    croak "Suitable player not found!" unless $player;
+    $player = $CVLC unless $player;
 
     if($pid = fork()) { # Parent
         print colored("Press Ctrl+C to stop execution...\n", 'red'); 
         print "Playing...\n";
         waitpid (-1, 0);
-        print "Exiting...\n";
     }
     elsif(defined $pid) { # Child
         sleep 1;
-        close STDIN;
-        close STDOUT unless $gVerbose;
-        close STDERR unless $gVerbose;
+
         open STDIN, '<', '/dev/null';
         open STDOUT, '>', '/dev/null' unless $gVerbose;
         open STDERR, '>', '/dev/null' unless $gVerbose;
@@ -82,7 +78,7 @@ sub play {
 
 ######################### MAIN ########################################
 sub help {
-    print "\n./", basename($0), " -s <station>", "\n\n";
+    print "\n./", basename($0), " -s <station> [-v]", "\n\n";
     
     print "Allowed stations:\n\t";
     {
