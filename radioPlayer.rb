@@ -59,11 +59,11 @@ def play(station)
         wait
     else
         sleep(1)
-        print "Player: ", player, "Station: ", Stations[station], "\n"
+        #print "Player: ", player, " Station: ", Stations[station], "\n"
         
-        $stdin = File.open('/dev/null', 'r')
-        $stdout = File.open('/dev/null', 'w') unless $gVerbose
-        $stderr = File.open('/dev/null', 'w') unless $gVerbose
+        $stdin.reopen('/dev/null', 'r')
+        $stdout.reopen('/dev/null', 'w') unless $gVerbose
+        $stderr.reopen('/dev/null', 'w') unless $gVerbose
         
         exec player, Stations[station]
     end
@@ -98,7 +98,7 @@ def main()
             when '--radio'
                 radio = arg
             when '--verbose'
-                $gVerbose.set = 1
+                $gVerbose = 1
             end
     end
                    
